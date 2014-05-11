@@ -4,4 +4,5 @@ webmoney_api/interfaces.py
 webmoney_api.egg-info/PKG-INFO
 webmoney_api.egg-info/SOURCES.txt
 webmoney_api.egg-info/dependency_links.txt
+webmoney_api.egg-info/requires.txt
 webmoney_api.egg-info/top_level.txt

@@ -4,6 +4,7 @@ import requests as r
 from pprint import pprint, pformat
 import uuid
 import xmltodict
+import os
 
 
 class AuthInterface(object):
@@ -31,7 +32,14 @@ class AuthInterface(object):
 class WMLightAuthInterface(AuthInterface):
 
     def __init__(self, pub_cert, priv_key=None):
-        self.cert = pub_cert if priv_key is None else (pub_cert, priv_key)
+        if not os.path.exists(pub_cert):
+            raise ValueError("Incorrect path to pub certificate")
+        if priv_key and not os.path.exists(priv_key):
+            raise ValueError("Incorrect path to private key")
+
+        self.cert = os.path.abspath(
+            pub_cert) if priv_key is None else (os.path.abspath(pub_cert),
+                                                os.path.abspath(priv_key))
 
     def wrap_request(self, request_params):
         request_params.update({"cert": self.cert})
@@ -46,23 +54,38 @@ class WMLightAuthInterface(AuthInterface):
 class ApiInterface(object):
 
     """
+    Основной интерфейс API.
+    Пример использования::
 
+        api = ApiInterface(WMLightAuthInterface(
+                    "/home/stas/wmcerts/crt.pem", "/home/stas/wmcerts/key.pem"))
+
+        import time
+        api.x8(purse="R328079907035", reqn=int(time.time()))[
+            "response"]["wmid"]["#text"]
+
+    Проксирует интерфейсы X1 - X10 в соответствующие атрибуты.
     """
 
     API_METADATA = {"FindWMPurseNew": {"root_name": "testwmpurse",
                                        "aliases": ["x8"]},
                     "Purses": {"root_name": "getpurses",
-                               "aliases": ["x9"]},
+                               "aliases": ["x9"],
+                               "response_name": "purses"},
                     "Invoice": {"root_name": "invoice",
                                 "aliases": ["x1"]},
                     "Trans": {"root_name": "trans",
-                              "aliases": ["x2"]},
+                              "aliases": ["x2"],
+                              "response_name": "operation"},
                     "Operations": {"root_name": "getoperations",
-                                   "aliases": ["x3"]},
+                                   "aliases": ["x3"],
+                                   "response_name": "operations"},
                     "OutInvoices": {"root_name": "getoutinvoices",
-                                    "aliases": ["x4"]},
+                                    "aliases": ["x4"],
+                                    "response_name": "outinvoices"},
                     "FinishProtect": {"root_name": "finishprotect",
-                                      "aliases": ["x5"]},
+                                      "aliases": ["x5"],
+                                      "response_name": "operation"},
                     "SendMsg": {"root_name": "message",
                                 "aliases": ["x6"]},
                     "ClassicAuth": {"root_name": "testsign",
@@ -116,7 +139,7 @@ class ApiInterface(object):
 
     def _create_request(self, interface, **kwargs):
         """
-        Создает запрос к api
+        Создает словарь параметров запроса к api. Тут вызывается функция :func:`AuthInterface.wrap_request`
         """
         request_params = {
             "url": self.authStrategy.get_url_by_name(interface), "verify": False}
@@ -126,7 +149,9 @@ class ApiInterface(object):
         return request_params
 
     def _create_body(self, interface, **params):
-
+        """
+        Создает XML-тело запроса. Тут вызывается функция :func:`AuthInterface.wrap_body_tree`
+        """
         tree = etree.Element("w3s.request")
 
         reqn = params.pop("reqn", None)
@@ -146,6 +171,9 @@ class ApiInterface(object):
         return etree.tostring(tree)
 
     def _make_request(self, interface, **params):
+        """
+        Функция, делающая HTTP запрос к API
+        """
         request_params = self._create_request(interface, **params)
         body = self._create_body(interface, **params)
 
@@ -162,6 +190,7 @@ class ApiInterface(object):
 
         out = xmltodict.parse(response.text)["w3s.response"]
         # print out
+        # pprint(request_params)
         # print self.API_METADATA[interface]["root_name"]
 
         try:
@@ -171,7 +200,7 @@ class ApiInterface(object):
         except:
             out = u"Error while requesting API. retval = %s, retdesc = %s" % (
                 out["retval"], out["retdesc"]) + "\n" +\
-                u"Request примет data: %s" % pformat(request_params)
+                u"Request data: %s" % pformat(request_params)
             raise ValueError(out.encode("utf-8"))
             exit(1)
 
@@ -194,6 +223,3 @@ class ApiInterface(object):
                 return _callback
 
         return object.__getattribute__(self, name)
-
-print ApiInterface(WMLightAuthInterface("/home/stas/wmcerts/crt.pem", "/home/stas/wmcerts/key.pem")).x4(
-    wmid="407414370132", reqn="100", datestart="20100101 00:00:00", datefinish="20140501 00:00:00")["response"]["ininvoice"]

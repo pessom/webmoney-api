@@ -2,10 +2,12 @@
 
 from setuptools import setup
 
-requires = []
+requires = ["lxml",
+            "xmltodict",
+            "requests"]
 
 setup(name='webmoney-api',
-      version='0.0.1',
+      version='0.0.2',
       description='Wrapper for webmoney interfaces',
       author='Stas Kaledin',
       author_email='staskaledin@gmail.com',

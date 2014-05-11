@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: webmoney-api
-Version: 0.0.1
+Version: 0.0.2
 Summary: Wrapper for webmoney interfaces
 Home-page: http://www.python.org/sigs/distutils-sig/
 Author: Stas Kaledin
