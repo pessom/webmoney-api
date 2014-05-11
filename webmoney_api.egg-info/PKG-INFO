@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: webmoney-api
+Version: 0.0.1
+Summary: Wrapper for webmoney interfaces
+Home-page: http://www.python.org/sigs/distutils-sig/
+Author: Stas Kaledin
+Author-email: staskaledin@gmail.com
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
