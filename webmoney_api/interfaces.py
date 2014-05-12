@@ -6,6 +6,24 @@ import uuid
 import xmltodict
 import os
 
+import ssl
+
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.poolmanager import PoolManager
+from requests.exceptions import SSLError
+
+
+class Ssl3HttpAdapter(HTTPAdapter):
+
+    """Transport adapter" that allows us to use SSLv3."""
+
+    def init_poolmanager(self, connections, maxsize, block=False):
+
+        self.poolmanager = PoolManager(num_pools=connections,
+                                       maxsize=maxsize,
+                                       block=block,
+                                       ssl_version=ssl.PROTOCOL_SSLv3)
+
 
 class AuthInterface(object):
 
@@ -179,7 +197,13 @@ class ApiInterface(object):
 
         request_params.update({"data": body})
 
-        response = r.post(**request_params)
+        # SSL v3 compability
+        # see http://docs.python-requests.org/en/latest/user/advanced/
+        s = r.Session()
+        a = Ssl3HttpAdapter(max_retries=3)
+        s.mount('https://', a)
+
+        response = s.get(**request_params)
 
         if response.status_code != 200:
             print "Something bad:"
