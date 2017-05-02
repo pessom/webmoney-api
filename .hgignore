@@ -5,3 +5,7 @@ syntax:glob
 *.egg-info
 *.sublime-*
 dist/*
+.tox
+.idea
+build
+.cache

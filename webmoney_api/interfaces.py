@@ -1,4 +1,6 @@
 #-*- coding: utf-8 -*-
+import logging
+
 from lxml import etree
 import requests as r
 from pprint import pprint, pformat
@@ -22,7 +24,7 @@ class Ssl3HttpAdapter(HTTPAdapter):
         self.poolmanager = PoolManager(num_pools=connections,
                                        maxsize=maxsize,
                                        block=block,
-                                       ssl_version=ssl.PROTOCOL_SSLv3)
+                                       ssl_version=ssl.PROTOCOL_SSLv23)
 
 
 class AuthInterface(object):
@@ -148,7 +150,7 @@ class ApiInterface(object):
         """
         root_name = self._get_root_name_by_interface_name(interface_name)
         tree = etree.Element(root_name)
-        for key, value in params.iteritems():
+        for key, value in params.items():
             subelement = etree.Element(key)
             subelement.text = value
             tree.append(subelement)
@@ -206,11 +208,7 @@ class ApiInterface(object):
         response = s.get(**request_params)
 
         if response.status_code != 200:
-            print "Something bad:"
-            print "Request status code:", response.status_code
-            print "Response:"
-            print response.text
-            exit(1)
+            raise ValueError("Bad response from webmoney api server: ({}) {}".format(response.status_code, response.text))
 
         out = xmltodict.parse(response.text)["w3s.response"]
         # print out
@@ -226,7 +224,6 @@ class ApiInterface(object):
                 out["retval"], out["retdesc"]) + "\n" +\
                 u"Request data: %s" % pformat(request_params)
             raise ValueError(out.encode("utf-8"))
-            exit(1)
 
         return {"retval": out["retval"],
                 "retdesc": out["retdesc"],
@@ -239,7 +236,7 @@ class ApiInterface(object):
 
             return _callback
 
-        for key, aliases in ApiInterface.API_METADATA.iteritems():
+        for key, aliases in ApiInterface.API_METADATA.items():
             aliases = aliases["aliases"]
             if name.lower() in aliases:
                 def _callback(**params):

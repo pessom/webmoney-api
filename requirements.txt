@@ -1,0 +1,10 @@
+lxml==3.7.3
+pluggy==0.4.0
+py==1.4.33
+pytest==3.0.7
+requests==2.13.0
+tox==2.7.0
+virtualenv==15.1.0
+-e hg+https://bitbucket.org/sallyruthstruik/python-webmoney-api@defaca8f4fedf66975a37e9a24870ac98b7c9571#egg=webmoney_api-dev
+wheel==0.24.0
+xmltodict==0.11.0

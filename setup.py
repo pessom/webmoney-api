@@ -1,17 +1,12 @@
 #!/usr/bin/env python
-
+from pip.req import parse_requirements
 from setuptools import setup
 
-requires = ["lxml",
-            "xmltodict",
-            "requests"]
-
 setup(name='webmoney-api',
-      version='0.0.2',
-      description='Wrapper for webmoney interfaces',
+      version='0.0.5',
+      description='Wrapper for webmoney interfaces (https://wiki.webmoney.ru/projects/webmoney/wiki/WM-API)',
       author='Stas Kaledin',
       author_email='staskaledin@gmail.com',
-      url='http://www.python.org/sigs/distutils-sig/',
+      url='https://bitbucket.org/sallyruthstruik/python-webmoney-api',
       packages=['webmoney_api'],
-      install_requires=requires
-      )
+      install_requires=[str(ir.req) for ir in parse_requirements("requirements.txt", session=-1)])
