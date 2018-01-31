@@ -1,0 +1,12 @@
+
+image: python:3.5.1
+pipelines:
+  default:
+    - step:
+        name: Install requirements
+        caches:
+          - pip
+        script:
+          - pip install -r requirements.txt
+
+
