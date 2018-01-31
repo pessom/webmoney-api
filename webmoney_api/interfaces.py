@@ -33,7 +33,7 @@ class AuthInterface(object):
     Интерфейс аунтефикации
     """
 
-    def wrap_request(request_params):
+    def wrap_request(self, request_params):
         """
 
         """

@@ -3,7 +3,7 @@ from pip.req import parse_requirements
 from setuptools import setup
 
 setup(name='webmoney-api',
-      version='0.0.7',
+      version='0.0.9',
       description='Wrapper for webmoney interfaces (https://wiki.webmoney.ru/projects/webmoney/wiki/WM-API)',
       author='Stas Kaledin',
       author_email='staskaledin@gmail.com',
