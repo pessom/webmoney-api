@@ -1,4 +1,4 @@
-lxml==4.9.1
+lxml==6.1.0
 requests==2.33.0
 wheel==0.46.2
 xmltodict==0.11.0
